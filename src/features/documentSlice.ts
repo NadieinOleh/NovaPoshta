@@ -1,11 +1,14 @@
-
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import type {} from 'redux-thunk/extend-redux';
 import { getDocument } from '../utils/axiosDocument';
 
+import { Ttn } from '../types/Ttn';
+
 interface TrackingState {
-  ttnNumber: string | number,
+  ttnNumber: string,
+  inputText: string
+  ttnNumberArray: string[],
   document: any[];
   error: string;
   isLoading: boolean;
@@ -13,6 +16,8 @@ interface TrackingState {
 
 const initialState: TrackingState = {
   ttnNumber: '',
+  inputText: '',
+  ttnNumberArray: [],
   document: [],
   error: '',
   isLoading: false,
@@ -22,8 +27,19 @@ const trackingSlice = createSlice({
   name: 'tracking',
   initialState,
   reducers: {
-    setTtnNumber(state, action: PayloadAction<number | string>) {
+    setTtnNumber(state, action: PayloadAction<string>) {
       state.ttnNumber = action.payload;
+    },
+    setInputText(state, action: PayloadAction<string>) {
+      state.inputText = action.payload;
+    },
+    deleteTtnNumberArray(state, action: PayloadAction<string[]>) {
+      state.ttnNumberArray = action.payload;
+      console.log('action ', action.payload);
+      
+    },
+    setTtnDocument(state, action: PayloadAction<Ttn[]>) {
+      state.document = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -32,7 +48,7 @@ const trackingSlice = createSlice({
       state.error = ''; 
     });
     builder.addCase(fetchStatusDocuments.rejected, (state, action) => {
-      state.error = 'Помилка при відправці запиту: ' + action.error.message;
+      state.error = 'Помилка при запиті: ' + action.error.message;
       state.isLoading = false;
     });
     builder.addCase(fetchStatusDocuments.fulfilled, (state, action) => {
@@ -43,8 +59,14 @@ const trackingSlice = createSlice({
     
         const numberExists = state.document.some(existingItem => existingItem.Number === Number);
     
+        const numberExistsArray = state.ttnNumberArray.some(existingItem => existingItem === Number);
+    
+        if (!numberExistsArray) {
+          state.ttnNumberArray.push(Number)
+        }
+
         if (!numberExists) {
-          state.document.push({ Number, Status, WarehouseSender, WarehouseRecipient });
+          state.document = [{ Number, Status, WarehouseSender, WarehouseRecipient }];
         }
       });
     
@@ -53,7 +75,7 @@ const trackingSlice = createSlice({
   },
 });
 
-export const { setTtnNumber } = trackingSlice.actions;
+export const { setTtnNumber, setTtnDocument, deleteTtnNumberArray, setInputText } = trackingSlice.actions;
 
 export default trackingSlice.reducer;
 

@@ -1,29 +1,38 @@
-import Container from '@mui/material/Container';
-import CssBaseline from '@mui/material/CssBaseline';
+import { useState } from 'react';
+
 import { TtnForm } from '../../components/TtnForm';
 import { ButtonsHeader } from '../../components/ButtonsHeader';
 import { InfoAndHistory } from '../../components/InfoAndHistory';
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { fetchStatusDocuments } from '../../features/documentSlice';
-import { getRequestData } from '../../utils/getRequestData';
+
+import Container from '@mui/material/Container';
+import CssBaseline from '@mui/material/CssBaseline';
+
 export const HomePage = () => {
+  const [isValidTtn, setValidTtn] = useState(false);
+  const [isShowInfoAndHisory, setShowInfoAndHisory] = useState(false);
+  const [isValidTtnMessage, setValidTtnMessage] = useState('TTN');
 
-  const ttn: string | number = useAppSelector(
-    (state) => state.tracking.ttnNumber
-  );
-  const data = useAppSelector((state) => state.tracking.document);
-
-  console.log(data);
-  
-  
   return (
     <>
       <CssBaseline />
       <Container maxWidth="md" sx={{ bgcolor: '#cfe8fc', height: '100vh' }}>
-        <ButtonsHeader />
-        <TtnForm />
-        <InfoAndHistory />
+        <ButtonsHeader
+          setValidTtnMessage={setValidTtnMessage}
+          setValidTtn={setValidTtn}
+        />
+        <TtnForm
+          isValidTtn={isValidTtn}
+          isValidTtnMessage={isValidTtnMessage}
+          setValidTtnMessage={setValidTtnMessage}
+          setValidTtn={setValidTtn}
+          label={isValidTtnMessage}
+          setShowInfoAndHisory={setShowInfoAndHisory}
+        />
+        {isShowInfoAndHisory && (
+          <InfoAndHistory 
+            setShowInfoAndHisory={setShowInfoAndHisory}
+          />
+        )}
       </Container>
     </>
   );

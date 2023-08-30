@@ -1,18 +1,25 @@
-import Box from '@mui/material/Box';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import { History } from '../History';
 import { Info } from '../Info';
 
-export const InfoAndHistory = () => {
-  const matches = useMediaQuery('(min-width:600px)');
+import Box from '@mui/material/Box';
 
+type Props = {
+  setShowInfoAndHisory: (show: boolean) => void;
+}
+
+export const InfoAndHistory: React.FC<Props> = ({setShowInfoAndHisory}) => {
   return (
     <Box
       p={2}
-      sx={{ display: 'flex', gap: '10px', justifyContent: 'space-between', flexDirection: matches ? 'row' : 'column' }}
+      sx={{ 
+        display: 'flex',
+        gap: '10px',
+        justifyContent: 'space-between',
+        flexDirection: 'column'
+      }}
     >
       <Info />
-      <History />
+      <History setShowInfoAndHisory={setShowInfoAndHisory}/>
     </Box>
   );
 };

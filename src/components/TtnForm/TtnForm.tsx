@@ -1,46 +1,104 @@
-import { TextField, Button } from '@mui/material';
-import './index.scss';
+import React, { useCallback } from 'react';
+import { RootState } from '../../app/store';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
-import { fetchStatusDocuments, setTtnNumber } from '../../features/documentSlice';
+import { fetchStatusDocuments, setInputText, setTtnNumber } from '../../features/documentSlice';
 import { getRequestData } from '../../utils/getRequestData';
 
-export const TtnForm = () => {
+import debounce from 'lodash.debounce';
+
+import { TextField } from '@mui/material';
+import LoadingButton from '@mui/lab/LoadingButton';
+import './index.scss';
+
+type Props = {
+  isValidTtn: boolean;
+  isValidTtnMessage: string;
+  setValidTtnMessage: (message: string) => void;
+  label: string;
+  setShowInfoAndHisory: (show: boolean) => void;
+  setValidTtn: (isValid: boolean) => void;
+}
+
+export const TtnForm: React.FC<Props> = React.memo(({ 
+  isValidTtn,
+  isValidTtnMessage,
+  setValidTtnMessage,
+  setValidTtn,
+  label,
+  setShowInfoAndHisory
+}) => {
   const dispatch = useAppDispatch();
-  const inputValue = useAppSelector((state) => state.tracking.ttnNumber);
+  const inputValue = useAppSelector((state: RootState) => state.tracking.ttnNumber);
+  const inputText = useAppSelector((state: RootState) => state.tracking.inputText);
+  const loading = useAppSelector((state: RootState) => state.tracking.isLoading);
 
-  console.log(inputValue);
+  const applyDebouncedQuery = useCallback(
+    debounce((value: string) => {
+      dispatch(setTtnNumber(value));
+    }, 500),
+    []
+  );
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(setTtnNumber(event.target.value));
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.value;
+    dispatch(setInputText(newValue))
+    applyDebouncedQuery(newValue);
+    setValidTtnMessage('TTN')
   };
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    setValidTtnMessage('Нажміть кнопку Перевірити ТТN');
+
+    if (isValidTtn) {
+      dispatch(fetchStatusDocuments(getRequestData(inputValue)));
+      setValidTtn(false);
+      dispatch(setTtnNumber(''));
+      dispatch(setInputText(''))
+      setValidTtnMessage('TTN');
+      setShowInfoAndHisory(true)
+    }
   };
 
-  const handleFetchStatusDocuments = () => {
-    dispatch(fetchStatusDocuments(getRequestData(inputValue)));
-    dispatch(setTtnNumber(''));
-  };
+  // if need to clear the input
+  // const handleFocus = useCallback(() => {
+  //   dispatch(setInputText(''));
+  // }, [])
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
+    <form 
+      className="form" 
+      onSubmit={handleSubmit}
+      autoComplete="off"
+    >
       <TextField
-        label="TTN"
+        label={isValidTtnMessage}
         variant="outlined"
-        value={inputValue}
-        onChange={handleInputChange}
+        value={inputText}
+        onChange={handleChange}
+        // onFocus={handleFocus}
         sx={{ flexGrow: 2 }}
+        InputLabelProps={{
+          sx:
+            label === 'Введіть правильний TTN'
+              ? { color: '#e81510' }
+              : label === 'TTN валидне, Нажміть кнопку Get Status TTN'
+              ? { color: '#0048ba' }
+              : label ==='Нажміть кнопку Перевірити ТТN'
+              ? { color: '#e81510' }
+              : null
+        }}
       />
-      <Button
-        type="submit"
-        variant="contained"
-        color="primary"
-        sx={{ flexGrow: 1 }}
-        onClick={handleFetchStatusDocuments}
-      >
-        Get status TTN
-      </Button>
+      <LoadingButton
+          loading={loading}
+          type="submit"
+          variant="contained"
+          color="primary"
+          sx={{ flexGrow: 1 }}
+        >
+          <span>Get status TTN</span>
+        </LoadingButton>
     </form>
   );
-};
+});

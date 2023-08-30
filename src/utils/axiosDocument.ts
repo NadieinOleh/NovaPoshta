@@ -9,3 +9,15 @@ export const getDocument = async (requestData: string) => {
     throw error;
   }
 }
+
+export const getAdress = async (requestAdress: string) => {
+  try {
+    const requestData = JSON.parse(requestAdress);
+    requestData.methodProperties = { ...requestData.methodProperties, Limit: 100 };
+
+    const response = await axios.post(URL, JSON.stringify(requestData));
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+}
