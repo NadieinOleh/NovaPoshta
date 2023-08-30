@@ -33,12 +33,14 @@ export const TtnForm: React.FC<Props> = React.memo(({
   const loading = useAppSelector((state: RootState) => state.tracking.isLoading);
 
   const applyDebouncedQuery = useCallback(
-    debounce((value: string) => {
-      dispatch(setTtnNumber(value));
-    }, 500),
-    []
+    (value: string) => {
+      debounce(() => {
+        dispatch(setTtnNumber(value));
+      }, 500)();
+    },
+    [dispatch]
   );
-
+  
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.value;
     dispatch(setInputText(newValue))

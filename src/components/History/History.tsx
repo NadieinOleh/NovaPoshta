@@ -79,6 +79,3 @@ export const History: React.FC<Props> = ({ setShowInfoAndHisory }) => {
     </Box>
   );
 };
-
-// 20450763721973
-// 20450763589742
