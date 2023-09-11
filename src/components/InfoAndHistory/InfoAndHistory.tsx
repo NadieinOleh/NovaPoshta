@@ -3,11 +3,7 @@ import { Info } from '../Info';
 
 import Box from '@mui/material/Box';
 
-type Props = {
-  setShowInfoAndHisory: (show: boolean) => void;
-}
-
-export const InfoAndHistory: React.FC<Props> = ({setShowInfoAndHisory}) => {
+export const InfoAndHistory = () => {
   return (
     <Box
       p={2}
@@ -19,7 +15,7 @@ export const InfoAndHistory: React.FC<Props> = ({setShowInfoAndHisory}) => {
       }}
     >
       <Info />
-      <History setShowInfoAndHisory={setShowInfoAndHisory}/>
+      <History />
     </Box>
   );
 };

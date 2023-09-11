@@ -6,11 +6,13 @@ import { InfoAndHistory } from '../../components/InfoAndHistory';
 
 import Container from '@mui/material/Container';
 import CssBaseline from '@mui/material/CssBaseline';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../app/store';
 
 export const HomePage = () => {
   const [isValidTtn, setValidTtn] = useState(false);
-  const [isShowInfoAndHisory, setShowInfoAndHisory] = useState(false);
   const [isValidTtnMessage, setValidTtnMessage] = useState('TTN');
+  const ttn = useSelector((state: RootState) => state.tracking.ttnNumberArray);
 
   return (
     <>
@@ -26,13 +28,8 @@ export const HomePage = () => {
           setValidTtnMessage={setValidTtnMessage}
           setValidTtn={setValidTtn}
           label={isValidTtnMessage}
-          setShowInfoAndHisory={setShowInfoAndHisory}
         />
-        {isShowInfoAndHisory && (
-          <InfoAndHistory 
-            setShowInfoAndHisory={setShowInfoAndHisory}
-          />
-        )}
+        {!!ttn.length && <InfoAndHistory />}
       </Container>
     </>
   );

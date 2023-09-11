@@ -1,9 +1,5 @@
-import { useEffect, useCallback } from 'react';
-import {
-  useAppDispatch,
-  useAppSelector,
-  useLocalStorage,
-} from '../../app/hooks';
+import { useCallback } from 'react';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import {
   deleteTtnNumberArray,
   fetchStatusDocuments,
@@ -13,32 +9,18 @@ import { getRequestData } from '../../utils/getRequestData';
 
 import { Box, Button, Typography } from '@mui/material';
 
-type Props = {
-  setShowInfoAndHisory: (show: boolean) => void;
-};
-
-export const History: React.FC<Props> = ({ setShowInfoAndHisory }) => {
+export const History = () => {
   const dispatch = useAppDispatch();
   const history = useAppSelector((state) => state.tracking.ttnNumberArray);
-  const [historyStorage, setHistoryStorage] = useLocalStorage<string[]>(
-    'history',
-    []
-  );
-
-  useEffect(() => {
-    setHistoryStorage(history);
-  }, [history, setHistoryStorage]);
 
   const handleClearHistory = useCallback(() => {
-    setShowInfoAndHisory(false);
-    setHistoryStorage([]);
     dispatch(deleteTtnNumberArray([]));
-    dispatch(setInputText(''))
-  }, [dispatch, setHistoryStorage, setShowInfoAndHisory]);
+    dispatch(setInputText(''));
+  }, [dispatch]);
 
   const getTtnData = useCallback(
     (ttn: string) => {
-      dispatch(setInputText(ttn))
+      dispatch(setInputText(ttn));
       dispatch(fetchStatusDocuments(getRequestData(ttn)));
     },
     [dispatch]
@@ -58,7 +40,7 @@ export const History: React.FC<Props> = ({ setShowInfoAndHisory }) => {
       <Typography variant="h6" component="div">
         Iсторія:
       </Typography>
-      {historyStorage.map((item: string) => (
+      {history.map((item: string) => (
         <Typography
           key={item}
           variant="h6"
@@ -69,11 +51,7 @@ export const History: React.FC<Props> = ({ setShowInfoAndHisory }) => {
           {item}
         </Typography>
       ))}
-      <Button 
-        sx={{ mt: 1 }} 
-        variant="contained"
-        onClick={handleClearHistory}
-      >
+      <Button sx={{ mt: 1 }} variant="contained" onClick={handleClearHistory}>
         Очистити історію
       </Button>
     </Box>
